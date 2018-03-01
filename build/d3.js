@@ -907,7 +907,8 @@ var matcher$1 = matcher;
 
 var filterEvents = {};
 
-exports.event = null;
+var _event = null
+exports.event = function() { return _event };
 
 if (typeof document !== "undefined") {
   var element$1 = document.documentElement;
@@ -928,12 +929,12 @@ function filterContextListener(listener, index, group) {
 
 function contextListener(listener, index, group) {
   return function(event1) {
-    var event0 = exports.event; // Events can be reentrant (e.g., focus).
-    exports.event = event1;
+    var event0 = exports.event(); // Events can be reentrant (e.g., focus).
+    _event = event1;
     try {
       listener.call(this, this.__data__, index, group);
     } finally {
-      exports.event = event0;
+      _event = event0;
     }
   };
 }
@@ -1003,18 +1004,18 @@ var selection_on = function(typename, value, capture) {
 };
 
 function customEvent(event1, listener, that, args) {
-  var event0 = exports.event;
-  event1.sourceEvent = exports.event;
-  exports.event = event1;
+  var event0 = exports.event();
+  event1.sourceEvent = exports.event();
+  _event = event1;
   try {
     return listener.apply(that, args);
   } finally {
-    exports.event = event0;
+    _event = event0;
   }
 }
 
 var sourceEvent = function() {
-  var current = exports.event, source;
+  var current = exports.event(), source;
   while (source = current.sourceEvent) current = source;
   return current;
 };
@@ -1765,12 +1766,12 @@ var touches = function(node, touches) {
 };
 
 function nopropagation() {
-  exports.event.stopImmediatePropagation();
+  exports.event().stopImmediatePropagation();
 }
 
 var noevent = function() {
-  exports.event.preventDefault();
-  exports.event.stopImmediatePropagation();
+  exports.event().preventDefault();
+  exports.event().stopImmediatePropagation();
 };
 
 var dragDisable = function(view) {
@@ -1825,7 +1826,7 @@ DragEvent.prototype.on = function() {
 
 // Ignore right-click, since that should open the context menu.
 function defaultFilter$1() {
-  return !exports.event.button;
+  return !exports.event().button;
 }
 
 function defaultContainer() {
@@ -1833,7 +1834,7 @@ function defaultContainer() {
 }
 
 function defaultSubject(d) {
-  return d == null ? {x: exports.event.x, y: exports.event.y} : d;
+  return d == null ? {x: exports.event().x, y: exports.event().y} : d;
 }
 
 function touchable() {
@@ -1868,34 +1869,34 @@ var drag = function() {
     if (touchending || !filter.apply(this, arguments)) return;
     var gesture = beforestart("mouse", container.apply(this, arguments), mouse, this, arguments);
     if (!gesture) return;
-    select(exports.event.view).on("mousemove.drag", mousemoved, true).on("mouseup.drag", mouseupped, true);
-    dragDisable(exports.event.view);
+    select(exports.event().view).on("mousemove.drag", mousemoved, true).on("mouseup.drag", mouseupped, true);
+    dragDisable(exports.event().view);
     nopropagation();
     mousemoving = false;
-    mousedownx = exports.event.clientX;
-    mousedowny = exports.event.clientY;
+    mousedownx = exports.event().clientX;
+    mousedowny = exports.event().clientY;
     gesture("start");
   }
 
   function mousemoved() {
     noevent();
     if (!mousemoving) {
-      var dx = exports.event.clientX - mousedownx, dy = exports.event.clientY - mousedowny;
+      var dx = exports.event().clientX - mousedownx, dy = exports.event().clientY - mousedowny;
       mousemoving = dx * dx + dy * dy > clickDistance2;
     }
     gestures.mouse("drag");
   }
 
   function mouseupped() {
-    select(exports.event.view).on("mousemove.drag mouseup.drag", null);
-    yesdrag(exports.event.view, mousemoving);
+    select(exports.event().view).on("mousemove.drag mouseup.drag", null);
+    yesdrag(exports.event().view, mousemoving);
     noevent();
     gestures.mouse("end");
   }
 
   function touchstarted() {
     if (!filter.apply(this, arguments)) return;
-    var touches = exports.event.changedTouches,
+    var touches = exports.event().changedTouches,
         c = container.apply(this, arguments),
         n = touches.length, i, gesture;
 
@@ -1908,7 +1909,7 @@ var drag = function() {
   }
 
   function touchmoved() {
-    var touches = exports.event.changedTouches,
+    var touches = exports.event().changedTouches,
         n = touches.length, i, gesture;
 
     for (i = 0; i < n; ++i) {
@@ -1920,7 +1921,7 @@ var drag = function() {
   }
 
   function touchended() {
-    var touches = exports.event.changedTouches,
+    var touches = exports.event().changedTouches,
         n = touches.length, i, gesture;
 
     if (touchending) clearTimeout(touchending);
@@ -1938,7 +1939,7 @@ var drag = function() {
         sublisteners = listeners.copy();
 
     if (!customEvent(new DragEvent(drag, "beforestart", s, id, active, p[0], p[1], 0, 0, sublisteners), function() {
-      if ((exports.event.subject = s = subject.apply(that, args)) == null) return false;
+      if ((exports.event().subject = s = subject.apply(that, args)) == null) return false;
       dx = s.x - p[0] || 0;
       dy = s.y - p[1] || 0;
       return true;
@@ -4126,12 +4127,12 @@ var BrushEvent = function(target, type, selection) {
 };
 
 function nopropagation$1() {
-  exports.event.stopImmediatePropagation();
+  exports.event().stopImmediatePropagation();
 }
 
 var noevent$1 = function() {
-  exports.event.preventDefault();
-  exports.event.stopImmediatePropagation();
+  exports.event().preventDefault();
+  exports.event().stopImmediatePropagation();
 };
 
 var MODE_DRAG = {name: "drag"};
@@ -4223,7 +4224,7 @@ function type(t) {
 
 // Ignore right-click, since that should open the context menu.
 function defaultFilter() {
-  return !exports.event.button;
+  return !exports.event().button;
 }
 
 function defaultExtent() {
@@ -4415,13 +4416,13 @@ function brush$1(dim) {
   };
 
   function started() {
-    if (exports.event.touches) { if (exports.event.changedTouches.length < exports.event.touches.length) return noevent$1(); }
+    if (exports.event().touches) { if (exports.event().changedTouches.length < exports.event().touches.length) return noevent$1(); }
     else if (touchending) return;
     if (!filter.apply(this, arguments)) return;
 
     var that = this,
-        type = exports.event.target.__data__.type,
-        mode = (exports.event.metaKey ? type = "overlay" : type) === "selection" ? MODE_DRAG : (exports.event.altKey ? MODE_CENTER : MODE_HANDLE),
+        type = exports.event().target.__data__.type,
+        mode = (exports.event().metaKey ? type = "overlay" : type) === "selection" ? MODE_DRAG : (exports.event().altKey ? MODE_CENTER : MODE_HANDLE),
         signX = dim === Y ? null : signsX[type],
         signY = dim === X ? null : signsY[type],
         state = local(that),
@@ -4434,7 +4435,7 @@ function brush$1(dim) {
         dx,
         dy,
         moving,
-        shifting = signX && signY && exports.event.shiftKey,
+        shifting = signX && signY && exports.event().shiftKey,
         lockX,
         lockY,
         point0 = mouse(that),
@@ -4464,18 +4465,18 @@ function brush$1(dim) {
     var overlay = group.selectAll(".overlay")
         .attr("cursor", cursors[type]);
 
-    if (exports.event.touches) {
+    if (exports.event().touches) {
       group
           .on("touchmove.brush", moved, true)
           .on("touchend.brush touchcancel.brush", ended, true);
     } else {
-      var view = select(exports.event.view)
+      var view = select(exports.event().view)
           .on("keydown.brush", keydowned, true)
           .on("keyup.brush", keyupped, true)
           .on("mousemove.brush", moved, true)
           .on("mouseup.brush", ended, true);
 
-      dragDisable(exports.event.view);
+      dragDisable(exports.event().view);
     }
 
     nopropagation$1();
@@ -4552,13 +4553,13 @@ function brush$1(dim) {
 
     function ended() {
       nopropagation$1();
-      if (exports.event.touches) {
-        if (exports.event.touches.length) return;
+      if (exports.event().touches) {
+        if (exports.event().touches.length) return;
         if (touchending) clearTimeout(touchending);
         touchending = setTimeout(function() { touchending = null; }, 500); // Ghost clicks are delayed!
         group.on("touchmove.brush touchend.brush touchcancel.brush", null);
       } else {
-        yesdrag(exports.event.view, moving);
+        yesdrag(exports.event().view, moving);
         view.on("keydown.brush keyup.brush mousemove.brush mouseup.brush", null);
       }
       group.attr("pointer-events", "all");
@@ -4569,7 +4570,7 @@ function brush$1(dim) {
     }
 
     function keydowned() {
-      switch (exports.event.keyCode) {
+      switch (exports.event().keyCode) {
         case 16: { // SHIFT
           shifting = signX && signY;
           break;
@@ -4599,7 +4600,7 @@ function brush$1(dim) {
     }
 
     function keyupped() {
-      switch (exports.event.keyCode) {
+      switch (exports.event().keyCode) {
         case 16: { // SHIFT
           if (shifting) {
             lockX = lockY = shifting = false;
@@ -4618,7 +4619,7 @@ function brush$1(dim) {
         }
         case 32: { // SPACE
           if (mode === MODE_SPACE) {
-            if (exports.event.altKey) {
+            if (exports.event().altKey) {
               if (signX) e0 = e1 - dx * signX, w0 = w1 + dx * signX;
               if (signY) s0 = s1 - dy * signY, n0 = n1 + dy * signY;
               mode = MODE_CENTER;
@@ -16091,17 +16092,17 @@ function transform$1(node) {
 }
 
 function nopropagation$2() {
-  exports.event.stopImmediatePropagation();
+  exports.event().stopImmediatePropagation();
 }
 
 var noevent$2 = function() {
-  exports.event.preventDefault();
-  exports.event.stopImmediatePropagation();
+  exports.event().preventDefault();
+  exports.event().stopImmediatePropagation();
 };
 
 // Ignore right-click, since that should open the context menu.
 function defaultFilter$2() {
-  return !exports.event.button;
+  return !exports.event().button;
 }
 
 function defaultExtent$1() {
@@ -16122,7 +16123,7 @@ function defaultTransform() {
 }
 
 function defaultWheelDelta() {
-  return -exports.event.deltaY * (exports.event.deltaMode ? 120 : 1) / 500;
+  return -exports.event().deltaY * (exports.event().deltaMode ? 120 : 1) / 500;
 }
 
 function touchable$1() {
@@ -16350,12 +16351,12 @@ var zoom = function() {
   function mousedowned() {
     if (touchending || !filter.apply(this, arguments)) return;
     var g = gesture(this, arguments),
-        v = select(exports.event.view).on("mousemove.zoom", mousemoved, true).on("mouseup.zoom", mouseupped, true),
+        v = select(exports.event().view).on("mousemove.zoom", mousemoved, true).on("mouseup.zoom", mouseupped, true),
         p = mouse(this),
-        x0 = exports.event.clientX,
-        y0 = exports.event.clientY;
+        x0 = exports.event().clientX,
+        y0 = exports.event().clientY;
 
-    dragDisable(exports.event.view);
+    dragDisable(exports.event().view);
     nopropagation$2();
     g.mouse = [p, this.__zoom.invert(p)];
     interrupt(this);
@@ -16364,7 +16365,7 @@ var zoom = function() {
     function mousemoved() {
       noevent$2();
       if (!g.moved) {
-        var dx = exports.event.clientX - x0, dy = exports.event.clientY - y0;
+        var dx = exports.event().clientX - x0, dy = exports.event().clientY - y0;
         g.moved = dx * dx + dy * dy > clickDistance2;
       }
       g.zoom("mouse", constrain(translate(g.that.__zoom, g.mouse[0] = mouse(g.that), g.mouse[1]), g.extent));
@@ -16372,7 +16373,7 @@ var zoom = function() {
 
     function mouseupped() {
       v.on("mousemove.zoom mouseup.zoom", null);
-      yesdrag(exports.event.view, g.moved);
+      yesdrag(exports.event().view, g.moved);
       noevent$2();
       g.end();
     }
@@ -16383,7 +16384,7 @@ var zoom = function() {
     var t0 = this.__zoom,
         p0 = mouse(this),
         p1 = t0.invert(p0),
-        k1 = t0.k * (exports.event.shiftKey ? 0.5 : 2),
+        k1 = t0.k * (exports.event().shiftKey ? 0.5 : 2),
         t1 = constrain(translate(scale(t0, k1), p0, p1), extent.apply(this, arguments));
 
     noevent$2();
@@ -16394,7 +16395,7 @@ var zoom = function() {
   function touchstarted() {
     if (!filter.apply(this, arguments)) return;
     var g = gesture(this, arguments),
-        touches = exports.event.changedTouches,
+        touches = exports.event().changedTouches,
         started,
         n = touches.length, i, t, p;
 
@@ -16426,7 +16427,7 @@ var zoom = function() {
 
   function touchmoved() {
     var g = gesture(this, arguments),
-        touches = exports.event.changedTouches,
+        touches = exports.event().changedTouches,
         n = touches.length, i, t, p, l;
 
     noevent$2();
@@ -16453,7 +16454,7 @@ var zoom = function() {
 
   function touchended() {
     var g = gesture(this, arguments),
-        touches = exports.event.changedTouches,
+        touches = exports.event().changedTouches,
         n = touches.length, i, t;
 
     nopropagation$2();
