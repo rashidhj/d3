@@ -39,7 +39,7 @@
     "rimraf": "2",
     "rollup": "0.55",
     "rollup-plugin-ascii": "0.0",
-    "rollup-plugin-node-resolve": "3",
+    "rollup-plugin-node-resolve": "5.2.0",
     "tape": "4",
     "uglify-js": "3.2"
   },
