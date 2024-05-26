@@ -36,7 +36,7 @@
   "devDependencies": {
     "json2module": "0.0",
     "package-preamble": "0.1",
-    "rimraf": "2",
+    "rimraf": "4.3.1",
     "rollup": "0.55",
     "rollup-plugin-ascii": "0.0",
     "rollup-plugin-node-resolve": "3",
